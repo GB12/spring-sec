@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<security:http auto-config="true" use-expressions="true">
+		<security:intercept-url pattern="/emp*"
+			access="hasRole('USER')" />
+		<security:intercept-url pattern="/save*"
+			access="hasRole('USER')" />
+
+		<security:form-login login-page="/login"
+			authentication-failure-url="/login" username-parameter="un"
+			password-parameter="pw" default-target-url="/emp" />
+	</security:http>
+
+	<bean id="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/springdb" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service
+				data-source-ref="ds"
+				authorities-by-username-query="select userid, role from roles where userid = ?"
+				users-by-username-query="select userid, pwd, active from appusers where userid = ?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<!-- <security:authentication-manager> <security:authentication-provider> 
+		<security:user-service> <security:user name="shantanu" authorities="ROLE_USER" 
+		password="welcome1" /> <security:user name="pavan" authorities="ROLE_ADMIN" 
+		password="welcome1" /> <security:user name="Arun" authorities="ROLE_USER" 
+		password="welcome1" disabled="true" /> </security:user-service> </security:authentication-provider> 
+		</security:authentication-manager> -->
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>
